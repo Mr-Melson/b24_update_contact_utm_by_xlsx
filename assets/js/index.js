@@ -1,6 +1,6 @@
 $ = jQuery;
 var page = 0;
-var count_rows = -1;
+var count_rows = 0;
 $( document ).ready(function() {
     
     setNextStep(page);
@@ -18,30 +18,39 @@ $( document ).ready(function() {
         })
         .done(data => {
 
-            count_rows = data.count_rows;
+            if (data.count_rows == -1) {
+                
+                $("#log").append( 'Файла не существует' );
+            } else {
 
-            jQuery.map( data.result, function( item, i ) {
-                $("#log").append( 'ID: ' + i + '. Имя контакта: ' + item + ' - метки установлены' );
-            });
-            
-            page++;
-
-            if (count_rows/50 >= page){
-                setTimeout(() => {
-                    setNextStep(page)
-                }, 1000);
-            } else{
-                $('.details').append('<h2>Алгоритм завершен!</h2>');
+                count_rows = data.count_rows;
+    
+                jQuery.map( data.result, function( item, i ) {
+                    $("#log").append( 'ID: ' + i + '. Имя контакта: ' + item + ' - метки установлены' );
+                });
+                
+                page++;
+    
+                if (count_rows/50 >= page){
+                    setTimeout(() => {
+                        setNextStep(page)
+                    }, 1000);
+                } else{
+                    $('.details').append('<h2>Алгоритм завершен!</h2>');
+                }
             }
+
 
         })
         .fail( function () { 
 
-            page++;
-
-            setTimeout(() => {
-                setNextStep(page)
-            }, 1000);
+            if (count_rows > 0) {
+                page++;
+    
+                setTimeout(() => {
+                    setNextStep(page)
+                }, 1000);
+            }
         });
     }
 
