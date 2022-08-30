@@ -1,6 +1,6 @@
 $ = jQuery;
 var page = 0;
-var count_rows = 0;
+var count_contacts = 0;
 $( document ).ready(function() {
     
     setNextStep(page);
@@ -18,40 +18,50 @@ $( document ).ready(function() {
         })
         .done(data => {
 
-            if (data.count_rows == -1) {
+            if (data.result == -1) {
                 
                 $("#log").append( 'Файла не существует' );
+
             } else {
 
-                count_rows = data.count_rows;
-    
-                jQuery.map( data.result, function( item, i ) {
-                    $("#log").append( 'ID: ' + i + '. Имя контакта: ' + item + ' - метки установлены' );
-                });
+                count_contacts = data.count_contacts;
+                
+                $("#log").append( '<p>Обновленные ID: ' + data.result + '</p>' );
                 
                 page++;
+                checkpage();
     
-                if (count_rows/50 >= page){
+                if (count_contacts == 50) {
+
                     setTimeout(() => {
                         setNextStep(page)
                     }, 1000);
-                } else{
-                    $('.details').append('<h2>Алгоритм завершен!</h2>');
+
+                } else if (count_contacts < 50) {
+                    $('#log').append('<h2>Алгоритм завершен!</h2>');
                 }
             }
-
 
         })
         .fail( function () { 
 
-            if (count_rows > 0) {
+            if (count_contacts > 0) {
+
                 page++;
+                checkpage();
     
                 setTimeout(() => {
                     setNextStep(page)
                 }, 1000);
             }
         });
+    }
+
+    function checkpage() {
+
+        if (50 < page < 280) {
+            page = 280;
+        }
     }
 
 });
