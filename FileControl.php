@@ -1,27 +1,52 @@
 <?
-$file_name = $_POST['file_name'];
-
+require_once (__DIR__ . '/DataBase.php');
 require_once (__DIR__ . '/SimpleXLSX.php');
 use Shuchkin\SimpleXLSX;
 
+$file_name = $_POST['file_name'];
+
 if ( $xlsx = SimpleXLSX::parse('xlsx/'.$file_name.'.xlsx') ) {
 
-    for ($i=1; $i < count($xlsx->rows()); $i++) {
+    $rows = $xlsx->rows();
+
+    for ($i=1; $i < count($rows); $i++) {
 
         if (
-            $xlsx->rows()[$i][5] != '' ||
-            $xlsx->rows()[$i][6] != '' ||
-            $xlsx->rows()[$i][7] != '' ||
-            $xlsx->rows()[$i][8] != '' ||
-            $xlsx->rows()[$i][9] != ''
+            $rows[$i][5] != '' ||
+            $rows[$i][6] != '' ||
+            $rows[$i][7] != '' ||
+            $rows[$i][8] != '' ||
+            $rows[$i][9] != ''
         ) {
-            
-            $json_rows[$xlsx->rows()[$i][3]]['phone']         = $xlsx->rows()[$i][2];
-            $json_rows[$xlsx->rows()[$i][3]]['utm_source']    = $xlsx->rows()[$i][5];
-            $json_rows[$xlsx->rows()[$i][3]]['utm_medium']    = $xlsx->rows()[$i][6];
-            $json_rows[$xlsx->rows()[$i][3]]['utm_campaign']  = $xlsx->rows()[$i][7];
-            $json_rows[$xlsx->rows()[$i][3]]['utm_term']      = $xlsx->rows()[$i][8];
-            $json_rows[$xlsx->rows()[$i][3]]['utm_content']   = $xlsx->rows()[$i][9];
+
+            $email          = $contacts_utm_database->real_escape_string( $rows[$i][3] );
+            $phone          = $contacts_utm_database->real_escape_string( $rows[$i][2] );
+            $utm_source     = $contacts_utm_database->real_escape_string( $rows[$i][5] );
+            $utm_medium     = $contacts_utm_database->real_escape_string( $rows[$i][6] );
+            $utm_campaign   = $contacts_utm_database->real_escape_string( $rows[$i][7] );
+            $utm_term       = $contacts_utm_database->real_escape_string( $rows[$i][8] );
+            $utm_content    = $contacts_utm_database->real_escape_string( $rows[$i][9] );
+
+            $contacts_utm_database->query(
+                "INSERT INTO `Contacts_UTM` (
+                    email,
+                    phone,
+                    utm_source,
+                    utm_medium,
+                    utm_campaign,
+                    utm_term,
+                    utm_content
+                ) 
+                VALUES (
+                    '$email',
+                    '$phone',
+                    '$utm_source',
+                    '$utm_medium',
+                    '$utm_campaign',
+                    '$utm_term',
+                    '$utm_content'
+                )"
+            );
         }
     }
 
