@@ -59,7 +59,7 @@ $( document ).ready(function() {
 
     function checkpage() {
 
-        if (50 < page < 280) {
+        if (5 < page < 280) {
             page = 280;
         }
     }
